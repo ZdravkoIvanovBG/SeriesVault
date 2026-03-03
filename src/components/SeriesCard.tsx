@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Bookmark, BookmarkCheck, Star, Tv } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Series } from "@/lib/series-data";
 import { useSeriesContext } from "@/context/SeriesContext";
 import { Badge } from "@/components/ui/badge";
@@ -89,8 +90,8 @@ const SeriesCard = ({ series, index = 0 }: SeriesCardProps) => {
       </div>
 
       {/* Info */}
-      <div className="p-4 space-y-2">
-        <h3 className="font-display font-semibold text-sm leading-tight line-clamp-1">
+      <Link to={`/series/${series.id}`} className="block p-4 space-y-2">
+        <h3 className="font-display font-semibold text-sm leading-tight line-clamp-1 group-hover:text-primary transition-colors">
           {series.title}
         </h3>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -109,7 +110,7 @@ const SeriesCard = ({ series, index = 0 }: SeriesCardProps) => {
             </span>
           ))}
         </div>
-      </div>
+      </Link>
     </motion.div>
   );
 };

@@ -1,13 +1,15 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { Series } from "@/lib/series-data";
 
 interface SeriesContextType {
   watchedIds: Set<string>;
   watchlistIds: Set<string>;
+  userRatings: Record<string, number>;
   toggleWatched: (id: string) => void;
   toggleWatchlist: (id: string) => void;
   isWatched: (id: string) => boolean;
   isOnWatchlist: (id: string) => boolean;
+  setUserRating: (id: string, rating: number) => void;
+  getUserRating: (id: string) => number | undefined;
 }
 
 const SeriesContext = createContext<SeriesContextType | undefined>(undefined);
@@ -29,6 +31,11 @@ export const SeriesProvider = ({ children }: { children: ReactNode }) => {
     return saved ? new Set(JSON.parse(saved)) : new Set();
   });
 
+  const [userRatings, setUserRatings] = useState<Record<string, number>>(() => {
+    const saved = localStorage.getItem("ratings");
+    return saved ? JSON.parse(saved) : {};
+  });
+
   useEffect(() => {
     localStorage.setItem("watched", JSON.stringify([...watchedIds]));
   }, [watchedIds]);
@@ -36,6 +43,10 @@ export const SeriesProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     localStorage.setItem("watchlist", JSON.stringify([...watchlistIds]));
   }, [watchlistIds]);
+
+  useEffect(() => {
+    localStorage.setItem("ratings", JSON.stringify(userRatings));
+  }, [userRatings]);
 
   const toggleWatched = (id: string) => {
     setWatchedIds((prev) => {
@@ -55,15 +66,22 @@ export const SeriesProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const setUserRating = (id: string, rating: number) => {
+    setUserRatings((prev) => ({ ...prev, [id]: rating }));
+  };
+
   return (
     <SeriesContext.Provider
       value={{
         watchedIds,
         watchlistIds,
+        userRatings,
         toggleWatched,
         toggleWatchlist,
         isWatched: (id) => watchedIds.has(id),
         isOnWatchlist: (id) => watchlistIds.has(id),
+        setUserRating,
+        getUserRating: (id) => userRatings[id],
       }}
     >
       {children}
