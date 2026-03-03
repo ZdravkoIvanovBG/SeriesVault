@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SeriesProvider } from "@/context/SeriesContext";
 import Header from "@/components/Header";
+import SeriesDetail from "./pages/SeriesDetail";
 import Index from "./pages/Index";
 import Watched from "./pages/Watched";
 import Watchlist from "./pages/Watchlist";
@@ -24,6 +25,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/watched" element={<Watched />} />
             <Route path="/watchlist" element={<Watchlist />} />
+            <Route path="/series/:id" element={<SeriesDetail />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </SeriesProvider>
