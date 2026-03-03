@@ -18,8 +18,8 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <SeriesProvider>
+      <SeriesProvider>
+        <BrowserRouter>
           <Header />
           <Routes>
             <Route path="/" element={<Index />} />
@@ -28,8 +28,8 @@ const App = () => (
             <Route path="/series/:id" element={<SeriesDetail />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </SeriesProvider>
-      </BrowserRouter>
+        </BrowserRouter>
+      </SeriesProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
