@@ -1,44 +1,26 @@
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Star, Eye, EyeOff, Bookmark, BookmarkCheck, Tv, Calendar, BarChart3 } from "lucide-react";
-import { seriesDatabase } from "@/lib/series-data";
+import { ArrowLeft, Star, Eye, EyeOff, Bookmark, BookmarkCheck, Tv, Calendar, BarChart3, Loader2 } from "lucide-react";
+import { useSeriesDetail } from "@/hooks/useTMDB";
 import { useSeriesContext } from "@/context/SeriesContext";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
-
-const StarRating = ({ rating, onRate }: { rating: number; onRate: (r: number) => void }) => {
-  const [hover, setHover] = useState(0);
-
-  return (
-    <div className="flex gap-1">
-      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
-        <button
-          key={star}
-          onClick={() => onRate(star)}
-          onMouseEnter={() => setHover(star)}
-          onMouseLeave={() => setHover(0)}
-          className="transition-transform hover:scale-125"
-        >
-          <Star
-            className={`h-6 w-6 transition-colors ${
-              star <= (hover || rating)
-                ? "fill-primary text-primary"
-                : "text-muted-foreground/30"
-            }`}
-          />
-        </button>
-      ))}
-    </div>
-  );
-};
+import StarRating from "@/components/StarRating";
 
 const SeriesDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const series = seriesDatabase.find((s) => s.id === id);
+  const { data: series, isLoading, error } = useSeriesDetail(id || "");
   const { isWatched, isOnWatchlist, toggleWatched, toggleWatchlist, getUserRating, setUserRating } =
     useSeriesContext();
 
-  if (!series) {
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!series || error) {
     return (
       <div className="container py-20 text-center">
         <p className="text-muted-foreground">Series not found.</p>
@@ -53,26 +35,18 @@ const SeriesDetail = () => {
   const onList = isOnWatchlist(series.id);
   const userRating = getUserRating(series.id) || 0;
 
-  // Generate mock season data
-  const seasonData = Array.from({ length: series.seasons }, (_, i) => ({
-    number: i + 1,
-    episodes: Math.floor(Math.random() * 6) + 6, // 6-11 episodes
-    year: parseInt(series.year) + i,
-  }));
-
   return (
     <div className="min-h-screen">
       {/* Hero banner */}
       <div className="relative h-[50vh] min-h-[360px] overflow-hidden">
         <img
-          src={series.image}
+          src={series.backdrop !== "/placeholder.svg" ? series.backdrop : series.image}
           alt={series.title}
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/30" />
         <div className="absolute inset-0 bg-gradient-to-r from-background/80 to-transparent" />
 
-        {/* Back button */}
         <div className="absolute top-6 left-6 z-10">
           <Link
             to="/"
@@ -109,7 +83,6 @@ const SeriesDetail = () => {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="space-y-6"
           >
-            {/* Title & badges */}
             <div className="space-y-3">
               <div className="flex flex-wrap items-center gap-2">
                 <Badge
@@ -142,6 +115,11 @@ const SeriesDetail = () => {
                   <Star className="h-4 w-4 fill-primary text-primary" />
                   {series.rating}/10
                 </span>
+                {series.networks && series.networks.length > 0 && (
+                  <span className="text-xs">
+                    on {series.networks.join(", ")}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -197,30 +175,33 @@ const SeriesDetail = () => {
             </div>
 
             {/* Season Breakdown */}
-            <div className="space-y-3">
-              <h2 className="font-display text-lg font-semibold">Seasons</h2>
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {seasonData.map((season) => (
-                  <motion.div
-                    key={season.number}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: season.number * 0.05 }}
-                    className="flex items-center gap-3 rounded-xl border border-border/50 bg-card p-4 card-hover"
-                  >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 font-display font-bold text-primary">
-                      S{season.number}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">Season {season.number}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {season.episodes} episodes · {season.year}
-                      </p>
-                    </div>
-                  </motion.div>
-                ))}
+            {series.seasonDetails && series.seasonDetails.length > 0 && (
+              <div className="space-y-3">
+                <h2 className="font-display text-lg font-semibold">Seasons</h2>
+                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  {series.seasonDetails.map((season) => (
+                    <motion.div
+                      key={season.season_number}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: season.season_number * 0.05 }}
+                      className="flex items-center gap-3 rounded-xl border border-border/50 bg-card p-4 card-hover"
+                    >
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 font-display font-bold text-primary">
+                        S{season.season_number}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{season.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {season.episode_count} episodes
+                          {season.air_date ? ` · ${season.air_date.substring(0, 4)}` : ""}
+                        </p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </motion.div>
         </div>
       </div>

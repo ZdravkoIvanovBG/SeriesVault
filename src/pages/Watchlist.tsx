@@ -1,13 +1,27 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Bookmark, ListPlus } from "lucide-react";
-import { seriesDatabase } from "@/lib/series-data";
+import { Bookmark, ListPlus, Loader2 } from "lucide-react";
 import { useSeriesContext } from "@/context/SeriesContext";
 import SeriesCard from "@/components/SeriesCard";
 import { Link } from "react-router-dom";
+import { useQueries } from "@tanstack/react-query";
+import { getSeriesDetail } from "@/lib/tmdb";
 
 const Watchlist = () => {
   const { watchlistIds } = useSeriesContext();
-  const series = seriesDatabase.filter((s) => watchlistIds.has(s.id));
+  const ids = Array.from(watchlistIds);
+
+  const queries = useQueries({
+    queries: ids.map((id) => ({
+      queryKey: ["tmdb", "series", id],
+      queryFn: () => getSeriesDetail(id),
+      staleTime: 10 * 60 * 1000,
+    })),
+  });
+
+  const loading = queries.some((q) => q.isLoading);
+  const series = queries
+    .filter((q) => q.data)
+    .map((q) => q.data!);
 
   return (
     <div className="min-h-screen">
@@ -25,7 +39,7 @@ const Watchlist = () => {
               <div>
                 <h1 className="font-display text-3xl font-bold">Watchlist</h1>
                 <p className="text-sm text-muted-foreground">
-                  {series.length} series to watch
+                  {ids.length} series to watch
                 </p>
               </div>
             </div>
@@ -34,7 +48,11 @@ const Watchlist = () => {
       </section>
 
       <section className="container py-8 md:py-12">
-        {series.length > 0 ? (
+        {loading && ids.length > 0 ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : series.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
             <AnimatePresence>
               {series.map((s, i) => (
