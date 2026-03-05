@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Bookmark, BookmarkCheck, Star, Tv } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Series } from "@/lib/series-data";
+import { Series } from "@/lib/tmdb";
 import { useSeriesContext } from "@/context/SeriesContext";
 import { Badge } from "@/components/ui/badge";
 
@@ -29,6 +29,7 @@ const SeriesCard = ({ series, index = 0 }: SeriesCardProps) => {
           alt={series.title}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
           loading="lazy"
+          onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
 
@@ -65,7 +66,7 @@ const SeriesCard = ({ series, index = 0 }: SeriesCardProps) => {
         {/* Action buttons */}
         <div className="absolute bottom-3 right-3 flex gap-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           <button
-            onClick={() => toggleWatched(series.id)}
+            onClick={(e) => { e.preventDefault(); toggleWatched(series.id); }}
             className={`flex h-9 w-9 items-center justify-center rounded-lg backdrop-blur-sm transition-colors ${
               watched
                 ? "bg-primary text-primary-foreground"
@@ -76,7 +77,7 @@ const SeriesCard = ({ series, index = 0 }: SeriesCardProps) => {
             {watched ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
           <button
-            onClick={() => toggleWatchlist(series.id)}
+            onClick={(e) => { e.preventDefault(); toggleWatchlist(series.id); }}
             className={`flex h-9 w-9 items-center justify-center rounded-lg backdrop-blur-sm transition-colors ${
               onList
                 ? "bg-primary text-primary-foreground"

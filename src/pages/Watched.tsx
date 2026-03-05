@@ -1,13 +1,27 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Eye, Popcorn } from "lucide-react";
-import { seriesDatabase } from "@/lib/series-data";
+import { Eye, Popcorn, Loader2 } from "lucide-react";
 import { useSeriesContext } from "@/context/SeriesContext";
 import SeriesCard from "@/components/SeriesCard";
 import { Link } from "react-router-dom";
+import { useQueries } from "@tanstack/react-query";
+import { getSeriesDetail } from "@/lib/tmdb";
 
 const Watched = () => {
   const { watchedIds } = useSeriesContext();
-  const watchedSeries = seriesDatabase.filter((s) => watchedIds.has(s.id));
+  const ids = Array.from(watchedIds);
+
+  const queries = useQueries({
+    queries: ids.map((id) => ({
+      queryKey: ["tmdb", "series", id],
+      queryFn: () => getSeriesDetail(id),
+      staleTime: 10 * 60 * 1000,
+    })),
+  });
+
+  const loading = queries.some((q) => q.isLoading);
+  const watchedSeries = queries
+    .filter((q) => q.data)
+    .map((q) => q.data!);
 
   return (
     <div className="min-h-screen">
@@ -25,12 +39,11 @@ const Watched = () => {
               <div>
                 <h1 className="font-display text-3xl font-bold">Watched</h1>
                 <p className="text-sm text-muted-foreground">
-                  {watchedSeries.length} series completed
+                  {ids.length} series completed
                 </p>
               </div>
             </div>
 
-            {/* Stats */}
             {watchedSeries.length > 0 && (
               <div className="flex gap-6 text-sm">
                 <div>
@@ -52,7 +65,11 @@ const Watched = () => {
       </section>
 
       <section className="container py-8 md:py-12">
-        {watchedSeries.length > 0 ? (
+        {loading && ids.length > 0 ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : watchedSeries.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
             <AnimatePresence>
               {watchedSeries.map((series, i) => (
