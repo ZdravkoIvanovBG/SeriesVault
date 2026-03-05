@@ -1,44 +1,78 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Search, Sparkles, Filter, Loader2 } from "lucide-react";
-import { useTrending, useSearchSeries, useGenres } from "@/hooks/useTMDB";
+import { Search, Sparkles, Filter, Loader2, ArrowUpDown, TrendingUp, Star, Flame, Tv } from "lucide-react";
+import { useBrowse, useSearchSeries, useGenres } from "@/hooks/useTMDB";
 import SeriesCard from "@/components/SeriesCard";
 import { Input } from "@/components/ui/input";
-import { Series } from "@/lib/tmdb";
+import { Series, BrowseCategory } from "@/lib/tmdb";
+
+type SortOption = "default" | "rating_desc" | "rating_asc" | "name_asc" | "name_desc" | "year_desc" | "year_asc";
+
+const CATEGORIES: { key: BrowseCategory; label: string; icon: React.ElementType }[] = [
+  { key: "trending", label: "Trending", icon: TrendingUp },
+  { key: "popular", label: "Popular", icon: Flame },
+  { key: "top_rated", label: "Top Rated", icon: Star },
+  { key: "airing_today", label: "Airing Today", icon: Tv },
+];
+
+const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+  { value: "default", label: "Default" },
+  { value: "rating_desc", label: "Rating: High → Low" },
+  { value: "rating_asc", label: "Rating: Low → High" },
+  { value: "name_asc", label: "Name: A → Z" },
+  { value: "name_desc", label: "Name: Z → A" },
+  { value: "year_desc", label: "Year: Newest" },
+  { value: "year_asc", label: "Year: Oldest" },
+];
+
+function sortSeries(series: Series[], sort: SortOption): Series[] {
+  if (sort === "default") return series;
+  const sorted = [...series];
+  switch (sort) {
+    case "rating_desc": return sorted.sort((a, b) => b.rating - a.rating);
+    case "rating_asc": return sorted.sort((a, b) => a.rating - b.rating);
+    case "name_asc": return sorted.sort((a, b) => a.title.localeCompare(b.title));
+    case "name_desc": return sorted.sort((a, b) => b.title.localeCompare(a.title));
+    case "year_desc": return sorted.sort((a, b) => (b.year || "0").localeCompare(a.year || "0"));
+    case "year_asc": return sorted.sort((a, b) => (a.year || "0").localeCompare(b.year || "0"));
+    default: return sorted;
+  }
+}
 
 const Index = () => {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
+  const [category, setCategory] = useState<BrowseCategory>("trending");
+  const [sortBy, setSortBy] = useState<SortOption>("default");
   const [page, setPage] = useState(1);
 
-  // Debounce search
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQuery(query), 400);
     return () => clearTimeout(t);
   }, [query]);
 
-  // Reset page on filter change
-  useEffect(() => { setPage(1); }, [debouncedQuery, selectedGenre]);
+  useEffect(() => { setPage(1); }, [debouncedQuery, selectedGenre, category]);
 
   const isSearching = debouncedQuery.length >= 2;
-  const { data: trendingData, isLoading: trendingLoading } = useTrending(page);
+  const { data: browseData, isLoading: browseLoading } = useBrowse(category, page);
   const { data: searchData, isLoading: searchLoading } = useSearchSeries(debouncedQuery, page);
   const { data: genres } = useGenres();
 
-  const loading = isSearching ? searchLoading : trendingLoading;
-  const sourceData = isSearching ? searchData : trendingData;
+  const loading = isSearching ? searchLoading : browseLoading;
+  const sourceData = isSearching ? searchData : browseData;
 
-  // Filter by genre client-side
-  let results: Series[] = sourceData?.results || [];
-  if (selectedGenre && !isSearching) {
-    // For trending, we can filter by genre from the genre_ids (already mapped)
-    // But since we mapped to strings, we need the genre name
-    const genreName = genres?.find((g) => g.id === selectedGenre)?.name;
-    if (genreName) {
-      results = results.filter((s) => s.genre.some((g) => g.toLowerCase().includes(genreName.toLowerCase())));
+  const results = useMemo(() => {
+    let items: Series[] = sourceData?.results || [];
+    // Genre filter (client-side on browse results)
+    if (selectedGenre && !isSearching) {
+      const genreName = genres?.find((g) => g.id === selectedGenre)?.name;
+      if (genreName) {
+        items = items.filter((s) => s.genre.some((g) => g.toLowerCase().includes(genreName.toLowerCase())));
+      }
     }
-  }
+    return sortSeries(items, sortBy);
+  }, [sourceData, selectedGenre, isSearching, genres, sortBy]);
 
   const totalPages = sourceData?.totalPages || 1;
 
@@ -71,7 +105,6 @@ const Index = () => {
               Search, track, and organize every TV series you've ever watched.
             </p>
 
-            {/* Search */}
             <div className="relative mx-auto max-w-md">
               <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -89,14 +122,42 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Filters & Grid */}
+      {/* Categories & Filters & Grid */}
       <section className="container py-8 md:py-12 space-y-6">
+        {/* Category tabs */}
+        {!isSearching && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none"
+          >
+            {CATEGORIES.map((cat) => {
+              const Icon = cat.icon;
+              const active = category === cat.key;
+              return (
+                <button
+                  key={cat.key}
+                  onClick={() => setCategory(cat.key)}
+                  className={`flex items-center gap-2 shrink-0 rounded-xl px-4 py-2.5 text-sm font-medium transition-all ${
+                    active
+                      ? "bg-primary text-primary-foreground glow-border"
+                      : "bg-secondary text-secondary-foreground hover:bg-surface-hover"
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {cat.label}
+                </button>
+              );
+            })}
+          </motion.div>
+        )}
+
         {/* Genre filters */}
         {genres && genres.length > 0 && !isSearching && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.15 }}
             className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none"
           >
             <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
@@ -108,7 +169,7 @@ const Index = () => {
                   : "bg-secondary text-secondary-foreground hover:bg-surface-hover"
               }`}
             >
-              All
+              All Genres
             </button>
             {genres.map((genre) => (
               <button
@@ -126,16 +187,31 @@ const Index = () => {
           </motion.div>
         )}
 
-        {/* Section title */}
-        <div className="flex items-center justify-between">
+        {/* Sort + count bar */}
+        <div className="flex items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
             {isSearching
               ? `${results.length} results for "${debouncedQuery}"`
-              : `Trending this week`}
+              : `${results.length} series`}
           </p>
+
+          <div className="flex items-center gap-2">
+            <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortOption)}
+              className="rounded-lg bg-secondary text-secondary-foreground border-none px-3 py-1.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary/50 cursor-pointer"
+            >
+              {SORT_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        {/* Loading state */}
+        {/* Loading */}
         {loading && (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -151,7 +227,6 @@ const Index = () => {
               ))}
             </div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex items-center justify-center gap-3 pt-6">
                 <button
@@ -183,7 +258,7 @@ const Index = () => {
             className="py-20 text-center"
           >
             <p className="text-muted-foreground">
-              {isSearching ? "No series found matching your search." : "Failed to load trending series."}
+              {isSearching ? "No series found matching your search." : "No series found."}
             </p>
           </motion.div>
         )}
