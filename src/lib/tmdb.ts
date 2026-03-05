@@ -114,12 +114,47 @@ async function callTMDB(endpoint: string, params?: Record<string, string>) {
   return data;
 }
 
+export type BrowseCategory = "trending" | "popular" | "top_rated" | "airing_today";
+
 export async function getTrending(page = 1): Promise<{ results: Series[]; totalPages: number }> {
   const data = await callTMDB("/trending/tv/week", { page: String(page) });
   return {
     results: (data.results || []).map(tmdbToSeries),
     totalPages: data.total_pages || 1,
   };
+}
+
+export async function getPopular(page = 1): Promise<{ results: Series[]; totalPages: number }> {
+  const data = await callTMDB("/tv/popular", { page: String(page) });
+  return {
+    results: (data.results || []).map(tmdbToSeries),
+    totalPages: data.total_pages || 1,
+  };
+}
+
+export async function getTopRated(page = 1): Promise<{ results: Series[]; totalPages: number }> {
+  const data = await callTMDB("/tv/top_rated", { page: String(page) });
+  return {
+    results: (data.results || []).map(tmdbToSeries),
+    totalPages: data.total_pages || 1,
+  };
+}
+
+export async function getAiringToday(page = 1): Promise<{ results: Series[]; totalPages: number }> {
+  const data = await callTMDB("/tv/airing_today", { page: String(page) });
+  return {
+    results: (data.results || []).map(tmdbToSeries),
+    totalPages: data.total_pages || 1,
+  };
+}
+
+export async function browseByCategory(category: BrowseCategory, page = 1) {
+  switch (category) {
+    case "trending": return getTrending(page);
+    case "popular": return getPopular(page);
+    case "top_rated": return getTopRated(page);
+    case "airing_today": return getAiringToday(page);
+  }
 }
 
 export async function searchSeries(query: string, page = 1): Promise<{ results: Series[]; totalPages: number }> {

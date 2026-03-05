@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { getTrending, searchSeries, getSeriesDetail, getGenres } from "@/lib/tmdb";
+import { browseByCategory, searchSeries, getSeriesDetail, getGenres, BrowseCategory } from "@/lib/tmdb";
 
-export function useTrending(page = 1) {
+export function useBrowse(category: BrowseCategory, page = 1) {
   return useQuery({
-    queryKey: ["tmdb", "trending", page],
-    queryFn: () => getTrending(page),
+    queryKey: ["tmdb", "browse", category, page],
+    queryFn: () => browseByCategory(category, page),
     staleTime: 5 * 60 * 1000,
   });
 }
