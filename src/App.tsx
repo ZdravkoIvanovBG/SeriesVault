@@ -9,6 +9,7 @@ import SeriesDetail from "./pages/SeriesDetail";
 import Index from "./pages/Index";
 import Watched from "./pages/Watched";
 import Watchlist from "./pages/Watchlist";
+import TierList from "./pages/TierList";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/watched" element={<Watched />} />
             <Route path="/watchlist" element={<Watchlist />} />
+            <Route path="/tier-list" element={<TierList />} />
             <Route path="/series/:id" element={<SeriesDetail />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
