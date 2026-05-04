@@ -14,7 +14,111 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_ratings: {
+        Row: {
+          rating: number
+          series_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          rating: number
+          series_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          rating?: number
+          series_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_tierlist: {
+        Row: {
+          position: number
+          series_id: string
+          tier: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          position?: number
+          series_id: string
+          tier: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          position?: number
+          series_id?: string
+          tier?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_watched: {
+        Row: {
+          created_at: string
+          series_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          series_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          series_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_watchlist: {
+        Row: {
+          created_at: string
+          series_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          series_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          series_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
