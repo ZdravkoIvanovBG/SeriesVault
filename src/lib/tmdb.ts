@@ -77,10 +77,24 @@ export function backdropUrl(path: string | null, size = "w1280"): string {
   return `${TMDB_IMAGE_BASE}/${size}${path}`;
 }
 
-function mapStatus(status?: string, inProduction?: boolean): "Ended" | "Ongoing" | "Upcoming" {
+function mapStatus(
+  status?: string,
+  inProduction?: boolean,
+  firstAirDate?: string,
+): "Ended" | "Ongoing" | "Upcoming" {
+  // Explicit TMDB statuses (only present on detail endpoint)
   if (status === "Returning Series" || status === "In Production" || inProduction) return "Ongoing";
-  if (status === "Planned") return "Upcoming";
-  return "Ended";
+  if (status === "Planned" || status === "Pilot") return "Upcoming";
+  if (status === "Ended" || status === "Canceled") return "Ended";
+
+  // Infer from first_air_date when status is not provided (list endpoints)
+  if (!firstAirDate) return "Upcoming";
+  const airTime = new Date(firstAirDate).getTime();
+  if (isNaN(airTime)) return "Ongoing";
+  const now = Date.now();
+  if (airTime > now) return "Upcoming";
+  // Default to Ongoing when we have no authoritative status; detail page corrects it.
+  return "Ongoing";
 }
 
 export function tmdbToSeries(t: TMDBSeries): Series {
@@ -101,7 +115,7 @@ export function tmdbToSeries(t: TMDBSeries): Series {
     description: t.overview || "No description available.",
     image: posterUrl(t.poster_path),
     backdrop: backdropUrl(t.backdrop_path),
-    status: mapStatus(t.status, t.in_production),
+    status: mapStatus(t.status, t.in_production, t.first_air_date),
   };
 }
 
