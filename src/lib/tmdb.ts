@@ -157,7 +157,8 @@ export async function getTopRated(page = 1): Promise<{ results: Series[]; totalP
 export async function getAiringToday(page = 1): Promise<{ results: Series[]; totalPages: number }> {
   const data = await callTMDB("/tv/airing_today", { page: String(page) });
   return {
-    results: (data.results || []).map(tmdbToSeries),
+    // Airing today is by definition currently on the air.
+    results: (data.results || []).map(tmdbToSeries).map((s: Series) => ({ ...s, status: "Ongoing" as const })),
     totalPages: data.total_pages || 1,
   };
 }
