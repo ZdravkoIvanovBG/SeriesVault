@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Tv, Eye, Search, Bookmark } from "lucide-react";
+import { Tv, Eye, Search, Bookmark, Layers } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSeriesContext } from "@/context/SeriesContext";
 
@@ -10,6 +10,7 @@ const Header = () => {
   const links = [
     { to: "/", label: "Discover", icon: Search },
     { to: "/watched", label: "Watched", icon: Eye, count: watchedIds.size },
+    { to: "/tier-list", label: "Tier List", icon: Layers },
     { to: "/watchlist", label: "Watchlist", icon: Bookmark, count: watchlistIds.size },
   ];
 
