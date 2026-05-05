@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Tv, Eye, Search, Bookmark, Layers, LogOut, User as UserIcon, CalendarClock } from "lucide-react";
+import { Tv, Eye, Search, Bookmark, Layers, LogOut, User as UserIcon, CalendarClock, PlayCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useSeriesContext } from "@/context/SeriesContext";
