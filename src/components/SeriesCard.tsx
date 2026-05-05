@@ -11,9 +11,11 @@ interface SeriesCardProps {
 }
 
 const SeriesCard = ({ series, index = 0 }: SeriesCardProps) => {
-  const { isWatched, isOnWatchlist, toggleWatched, toggleWatchlist } = useSeriesContext();
+  const { isWatched, isOnWatchlist, toggleWatched, toggleWatchlist, isCurrentlyWatching, startCurrentlyWatching, removeCurrentlyWatching, currentlyWatching } = useSeriesContext();
   const watched = isWatched(series.id);
   const onList = isOnWatchlist(series.id);
+  const watching = isCurrentlyWatching(series.id);
+  const progress = currentlyWatching[series.id];
 
   return (
     <motion.div
