@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Tv, Eye, Search, Bookmark, Layers, LogOut, User as UserIcon, CalendarClock } from "lucide-react";
+import { Tv, Eye, Search, Bookmark, Layers, LogOut, User as UserIcon, CalendarClock, PlayCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useSeriesContext } from "@/context/SeriesContext";
@@ -18,7 +18,7 @@ import {
 const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { watchedIds, watchlistIds } = useSeriesContext();
+  const { watchedIds, watchlistIds, currentlyWatching } = useSeriesContext();
   const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
 
@@ -34,6 +34,7 @@ const Header = () => {
 
   const links = [
     { to: "/", label: "Discover", icon: Search },
+    { to: "/currently-watching", label: "Watching", icon: PlayCircle, count: Object.keys(currentlyWatching).length },
     { to: "/watched", label: "Watched", icon: Eye, count: watchedIds.size },
     { to: "/tier-list", label: "Tier List", icon: Layers },
     { to: "/watchlist", label: "Watchlist", icon: Bookmark, count: watchlistIds.size },

@@ -38,6 +38,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_currently_watching: {
+        Row: {
+          episode: number
+          season: number
+          series_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          episode?: number
+          season?: number
+          series_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          episode?: number
+          season?: number
+          series_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_ratings: {
         Row: {
           rating: number
