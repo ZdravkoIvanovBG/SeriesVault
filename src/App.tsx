@@ -34,6 +34,7 @@ const App = () => (
               <Route path="/watched" element={<ProtectedRoute><Watched /></ProtectedRoute>} />
               <Route path="/watchlist" element={<ProtectedRoute><Watchlist /></ProtectedRoute>} />
               <Route path="/tier-list" element={<ProtectedRoute><TierList /></ProtectedRoute>} />
+              <Route path="/upcoming" element={<ProtectedRoute><Upcoming /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/series/:id" element={<ProtectedRoute><SeriesDetail /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
