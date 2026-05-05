@@ -65,8 +65,25 @@ const SeriesCard = ({ series, index = 0 }: SeriesCardProps) => {
           </motion.div>
         )}
 
+        {/* Currently watching badge */}
+        {watching && !watched && (
+          <div className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-lg bg-primary/90 backdrop-blur-sm px-2 py-1 text-primary-foreground">
+            <CircleDot className="h-3.5 w-3.5" />
+            <span className="text-xs font-semibold">S{progress.season}·E{progress.episode}</span>
+          </div>
+        )}
+
         {/* Action buttons */}
         <div className="absolute bottom-3 right-3 flex gap-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          <button
+            onClick={(e) => { e.preventDefault(); watching ? removeCurrentlyWatching(series.id) : startCurrentlyWatching(series.id); }}
+            className={`flex h-9 w-9 items-center justify-center rounded-lg backdrop-blur-sm transition-colors ${
+              watching ? "bg-primary text-primary-foreground" : "bg-background/80 text-foreground hover:bg-primary hover:text-primary-foreground"
+            }`}
+            title={watching ? "Stop currently watching" : "Mark as currently watching"}
+          >
+            <PlayCircle className="h-4 w-4" />
+          </button>
           <button
             onClick={(e) => { e.preventDefault(); toggleWatched(series.id); }}
             className={`flex h-9 w-9 items-center justify-center rounded-lg backdrop-blur-sm transition-colors ${
