@@ -34,6 +34,7 @@ const Header = () => {
 
   const links = [
     { to: "/", label: "Discover", icon: Search },
+    { to: "/currently-watching", label: "Watching", icon: PlayCircle, count: Object.keys(currentlyWatching).length },
     { to: "/watched", label: "Watched", icon: Eye, count: watchedIds.size },
     { to: "/tier-list", label: "Tier List", icon: Layers },
     { to: "/watchlist", label: "Watchlist", icon: Bookmark, count: watchlistIds.size },
