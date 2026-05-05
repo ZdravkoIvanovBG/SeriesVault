@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Bookmark, BookmarkCheck, Star, Tv } from "lucide-react";
+import { Eye, EyeOff, Bookmark, BookmarkCheck, Star, Tv, PlayCircle, CircleDot } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Series } from "@/lib/tmdb";
 import { useSeriesContext } from "@/context/SeriesContext";
