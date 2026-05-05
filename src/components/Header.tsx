@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Tv, Eye, Search, Bookmark, Layers, LogOut, User as UserIcon } from "lucide-react";
+import { Tv, Eye, Search, Bookmark, Layers, LogOut, User as UserIcon, CalendarClock } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useSeriesContext } from "@/context/SeriesContext";
@@ -37,6 +37,7 @@ const Header = () => {
     { to: "/watched", label: "Watched", icon: Eye, count: watchedIds.size },
     { to: "/tier-list", label: "Tier List", icon: Layers },
     { to: "/watchlist", label: "Watchlist", icon: Bookmark, count: watchlistIds.size },
+    { to: "/upcoming", label: "Upcoming", icon: CalendarClock },
   ];
 
   if (location.pathname === "/auth") return null;
