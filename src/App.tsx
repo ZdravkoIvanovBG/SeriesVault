@@ -12,6 +12,7 @@ import Index from "./pages/Index";
 import Watched from "./pages/Watched";
 import Watchlist from "./pages/Watchlist";
 import TierList from "./pages/TierList";
+import Upcoming from "./pages/Upcoming";
 import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
