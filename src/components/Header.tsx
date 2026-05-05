@@ -18,7 +18,7 @@ import {
 const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { watchedIds, watchlistIds } = useSeriesContext();
+  const { watchedIds, watchlistIds, currentlyWatching } = useSeriesContext();
   const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
 
