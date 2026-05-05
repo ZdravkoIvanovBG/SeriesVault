@@ -33,6 +33,7 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
               <Route path="/watched" element={<ProtectedRoute><Watched /></ProtectedRoute>} />
+              <Route path="/currently-watching" element={<ProtectedRoute><CurrentlyWatching /></ProtectedRoute>} />
               <Route path="/watchlist" element={<ProtectedRoute><Watchlist /></ProtectedRoute>} />
               <Route path="/tier-list" element={<ProtectedRoute><TierList /></ProtectedRoute>} />
               <Route path="/upcoming" element={<ProtectedRoute><Upcoming /></ProtectedRoute>} />
