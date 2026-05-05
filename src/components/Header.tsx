@@ -37,6 +37,7 @@ const Header = () => {
     { to: "/watched", label: "Watched", icon: Eye, count: watchedIds.size },
     { to: "/tier-list", label: "Tier List", icon: Layers },
     { to: "/watchlist", label: "Watchlist", icon: Bookmark, count: watchlistIds.size },
+    { to: "/upcoming", label: "Upcoming", icon: CalendarClock },
   ];
 
   if (location.pathname === "/auth") return null;
