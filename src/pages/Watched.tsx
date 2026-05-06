@@ -22,6 +22,7 @@ const Watched = () => {
   const watchedSeries = queries
     .filter((q) => q.data)
     .map((q) => q.data!);
+  const ongoingSeries = watchedSeries.filter((s) => s.status === "Ongoing" || s.status === "Upcoming");
 
   return (
     <div className="min-h-screen">
