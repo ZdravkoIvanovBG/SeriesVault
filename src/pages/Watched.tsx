@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Eye, Popcorn, Loader2 } from "lucide-react";
+import { Eye, Popcorn, Loader2, CalendarClock } from "lucide-react";
 import { useSeriesContext } from "@/context/SeriesContext";
 import SeriesCard from "@/components/SeriesCard";
 import { Link } from "react-router-dom";
