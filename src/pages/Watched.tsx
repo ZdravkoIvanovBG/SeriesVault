@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Eye, Popcorn, Loader2 } from "lucide-react";
+import { Eye, Popcorn, Loader2, CalendarClock } from "lucide-react";
 import { useSeriesContext } from "@/context/SeriesContext";
 import SeriesCard from "@/components/SeriesCard";
 import { Link } from "react-router-dom";
@@ -22,6 +22,7 @@ const Watched = () => {
   const watchedSeries = queries
     .filter((q) => q.data)
     .map((q) => q.data!);
+  const ongoingSeries = watchedSeries.filter((s) => s.status === "Ongoing" || s.status === "Upcoming");
 
   return (
     <div className="min-h-screen">
@@ -64,7 +65,46 @@ const Watched = () => {
         </div>
       </section>
 
-      <section className="container py-8 md:py-12">
+      <section className="container py-8 md:py-12 space-y-10">
+        {!loading && ongoingSeries.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl border border-primary/30 bg-primary/5 p-5 md:p-6 space-y-4 glow-border"
+          >
+            <div className="flex items-start justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/15">
+                  <CalendarClock className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <h2 className="font-display text-lg font-semibold">Still going — new episodes ahead</h2>
+                  <p className="text-xs text-muted-foreground">
+                    {ongoingSeries.length} {ongoingSeries.length === 1 ? "series" : "series"} you've watched {ongoingSeries.length === 1 ? "is" : "are"} not fully ended yet.
+                  </p>
+                </div>
+              </div>
+              <Link
+                to="/upcoming"
+                className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+              >
+                See upcoming episodes
+              </Link>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {ongoingSeries.slice(0, 12).map((s) => (
+                <Link
+                  key={s.id}
+                  to={`/series/${s.id}`}
+                  className="rounded-full border border-border/60 bg-background/40 px-3 py-1.5 text-xs font-medium hover:border-primary/60 hover:text-primary transition-colors"
+                >
+                  {s.title}
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
         {loading && ids.length > 0 ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
