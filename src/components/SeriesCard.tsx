@@ -3,6 +3,7 @@ import { Eye, EyeOff, Bookmark, BookmarkCheck, Star, Tv, PlayCircle, CircleDot }
 import { Link } from "react-router-dom";
 import { Series } from "@/lib/tmdb";
 import { useSeriesContext } from "@/context/SeriesContext";
+import { useSeriesDetail } from "@/hooks/useTMDB";
 import { Badge } from "@/components/ui/badge";
 
 interface SeriesCardProps {
@@ -16,6 +17,9 @@ const SeriesCard = ({ series, index = 0 }: SeriesCardProps) => {
   const onList = isOnWatchlist(series.id);
   const watching = isCurrentlyWatching(series.id);
   const progress = currentlyWatching[series.id];
+  // Fetch authoritative status from TMDB detail (cached by react-query)
+  const { data: detail } = useSeriesDetail(series.id);
+  const status = detail?.status ?? series.status;
 
   return (
     <motion.div
@@ -38,10 +42,10 @@ const SeriesCard = ({ series, index = 0 }: SeriesCardProps) => {
         {/* Status badge */}
         <div className="absolute top-3 left-3">
           <Badge
-            variant={series.status === "Ongoing" ? "default" : "secondary"}
-            className={`text-xs ${series.status === "Ongoing" ? "bg-primary/90 text-primary-foreground" : ""}`}
+            variant={status === "Ongoing" ? "default" : "secondary"}
+            className={`text-xs ${status === "Ongoing" ? "bg-primary/90 text-primary-foreground" : ""}`}
           >
-            {series.status}
+            {status}
           </Badge>
         </div>
 
