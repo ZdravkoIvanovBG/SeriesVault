@@ -90,11 +90,14 @@ function mapStatus(
   // Infer from first_air_date when status is not provided (list endpoints)
   if (!firstAirDate) return "Upcoming";
   const airTime = new Date(firstAirDate).getTime();
-  if (isNaN(airTime)) return "Ongoing";
+  if (isNaN(airTime)) return "Ended";
   const now = Date.now();
   if (airTime > now) return "Upcoming";
-  // Default to Ongoing when we have no authoritative status; detail page corrects it.
-  return "Ongoing";
+  // If the show first aired within the last ~18 months, assume it's still Ongoing.
+  const eighteenMonthsMs = 18 * 30 * 24 * 60 * 60 * 1000;
+  if (now - airTime <= eighteenMonthsMs) return "Ongoing";
+  // Older shows with no authoritative status default to Ended; detail page corrects it.
+  return "Ended";
 }
 
 export function tmdbToSeries(t: TMDBSeries): Series {
