@@ -109,10 +109,10 @@ const UpcomingCard = ({ info, index }: { info: NextEpisodeInfo; index: number })
 };
 
 const Upcoming = () => {
-  const { watchedIds, watchlistIds } = useSeriesContext();
+  const { watchedIds, watchlistIds, currentlyWatching } = useSeriesContext();
   const ids = useMemo(
-    () => Array.from(new Set([...watchedIds, ...watchlistIds])),
-    [watchedIds, watchlistIds],
+    () => Array.from(new Set([...watchedIds, ...watchlistIds, ...Object.keys(currentlyWatching)])),
+    [watchedIds, watchlistIds, currentlyWatching],
   );
 
   const queries = useQueries({
