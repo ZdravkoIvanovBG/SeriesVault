@@ -3,6 +3,7 @@ import { Eye, EyeOff, Bookmark, BookmarkCheck, Star, Tv, PlayCircle, CircleDot }
 import { Link } from "react-router-dom";
 import { Series } from "@/lib/tmdb";
 import { useSeriesContext } from "@/context/SeriesContext";
+import { useSeriesDetail } from "@/hooks/useTMDB";
 import { Badge } from "@/components/ui/badge";
 
 interface SeriesCardProps {
@@ -16,6 +17,9 @@ const SeriesCard = ({ series, index = 0 }: SeriesCardProps) => {
   const onList = isOnWatchlist(series.id);
   const watching = isCurrentlyWatching(series.id);
   const progress = currentlyWatching[series.id];
+  // Fetch authoritative status from TMDB detail (cached by react-query)
+  const { data: detail } = useSeriesDetail(series.id);
+  const status = detail?.status ?? series.status;
 
   return (
     <motion.div
