@@ -17,11 +17,15 @@ export const useTierList = () => {
   useEffect(() => {
     if (!user) { setTiers(empty()); return; }
     (async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("user_tierlist")
         .select("series_id, tier, position")
         .eq("user_id", user.id)
         .order("position", { ascending: true });
+      if (error) {
+        console.error("[tierlist] load error:", error);
+        return;
+      }
       const next = empty();
       (data ?? []).forEach((row: any) => {
         if (TIERS.includes(row.tier)) next[row.tier as TierKey].push(row.series_id);
@@ -31,49 +35,54 @@ export const useTierList = () => {
   }, [user]);
 
   const persistTier = useCallback(async (tier: TierKey, ids: string[]) => {
-    if (!user) return;
-    // Remove existing rows for these series in this tier scope and reinsert in order
-    if (ids.length === 0) return;
+    if (!user || ids.length === 0) return;
     const rows = ids.map((series_id, position) => ({
       user_id: user.id,
       series_id,
       tier,
       position,
     }));
-    await supabase.from("user_tierlist").upsert(rows, { onConflict: "user_id,series_id" });
+    const { error } = await supabase
+      .from("user_tierlist")
+      .upsert(rows, { onConflict: "user_id,series_id" });
+    if (error) console.error("[tierlist] upsert error:", error);
   }, [user]);
 
   const assign = useCallback(async (id: string, tier: TierKey | null, beforeId?: string | null) => {
     if (!user) return;
-    let nextState: TierMap = empty();
-    setTiers((prev) => {
-      const next: TierMap = { S: [...prev.S], A: [...prev.A], B: [...prev.B], C: [...prev.C], D: [...prev.D], F: [...prev.F] };
-      for (const k of TIERS) next[k] = next[k].filter((x) => x !== id);
-      if (tier) {
-        if (beforeId && beforeId !== id) {
-          const idx = next[tier].indexOf(beforeId);
-          if (idx >= 0) next[tier].splice(idx, 0, id);
-          else next[tier].push(id);
-        } else {
-          next[tier].push(id);
-        }
+
+    // Compute next state synchronously from current tiers
+    const next: TierMap = { S: [...tiers.S], A: [...tiers.A], B: [...tiers.B], C: [...tiers.C], D: [...tiers.D], F: [...tiers.F] };
+    for (const k of TIERS) next[k] = next[k].filter((x) => x !== id);
+    if (tier) {
+      if (beforeId && beforeId !== id) {
+        const idx = next[tier].indexOf(beforeId);
+        if (idx >= 0) next[tier].splice(idx, 0, id);
+        else next[tier].push(id);
+      } else {
+        next[tier].push(id);
       }
-      nextState = next;
-      return next;
-    });
+    }
+    setTiers(next);
 
     // Persist
     if (tier) {
-      await persistTier(tier, nextState[tier]);
+      await persistTier(tier, next[tier]);
     } else {
-      await supabase.from("user_tierlist").delete().eq("user_id", user.id).eq("series_id", id);
+      const { error } = await supabase
+        .from("user_tierlist")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("series_id", id);
+      if (error) console.error("[tierlist] delete error:", error);
     }
-  }, [user, persistTier]);
+  }, [user, persistTier, tiers]);
 
   const reset = useCallback(async () => {
     if (!user) return;
     setTiers(empty());
-    await supabase.from("user_tierlist").delete().eq("user_id", user.id);
+    const { error } = await supabase.from("user_tierlist").delete().eq("user_id", user.id);
+    if (error) console.error("[tierlist] reset error:", error);
   }, [user]);
 
   const tierOf = useCallback((id: string): TierKey | null => {
