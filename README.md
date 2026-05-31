@@ -34,7 +34,7 @@ Ensure you have the following installed on your machine:
 
 ### Step 1: Clone the Repository
 ```bash
-git clone [https://github.com/yourusername/SeriesVault.git](https://github.com/yourusername/SeriesVault.git)
+git clone https://github.com/ZdravkoIvanovBG/SeriesVault.git
 cd SeriesVault
 ```
 
