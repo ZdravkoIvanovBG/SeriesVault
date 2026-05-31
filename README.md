@@ -1,73 +1,69 @@
-# Welcome to your Lovable project
+# 🎬 SeriesVault
 
-## Project info
+### 🔗 [Live Demo Link](https://series-star-project.onrender.com/)
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+SeriesVault is a dynamic media tracking application designed for movie enthusiasts who want complete control over their cinematic journey. Instead of just browsing, users can actively manage their viewing history, curate upcoming releases, and visually rank their favorite content.
 
-## How can I edit this code?
+> ⏳ **Note on Free Hosting:** This app is hosted on a free tier. If the page takes 30–60 seconds to load initially, the server is spinning up from its sleep cycle. Thank you for your patience!
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## 🚀 Key Features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+*   **Comprehensive Movie Database:** Search, filter, and explore an extensive library of movies and series.
+*   **Smart Tracking:** Mark titles as **Watched** or save them to your personal **Watchlist** with a single click.
+*   **Custom Tier Lists:** Visually rank your absolute favorite movies into an 'S' to 'F' tier list creator to showcase your personal taste.
+*   **Automated Release Calendar:** A dynamic dashboard displaying **Upcoming Movies** parsed directly from your Watchlist and Watched preferences so you never miss a premiere.
+*   **User Authentication:** Secure user registration, login session tracking, and private dashboard management.
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🛠️ Tech Stack & Architecture
 
-**Use your preferred IDE**
+*   **Frontend Generation:** Lovable AI Engine
+*   **Frontend Framework:** React.js, TypeScript, Vite, Tailwind CSS, Shadcn UI
+*   **Backend & Database:** Supabase (PostgreSQL)
+*   **Authentication:** Supabase Auth (Email/Password session management)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## ⚙️ Local Development Setup
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+If you wish to clone this repository and run it locally, follow these steps:
 
-Follow these steps:
+### Prerequisites
+Ensure you have the following installed on your machine:
+*   [Node.js](https://nodejs.org/) (v18 or higher)
+*   A [Supabase](https://supabase.com/) account (to connect your own database)
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Step 1: Clone the Repository
+```bash
+git clone [https://github.com/yourusername/SeriesVault.git](https://github.com/yourusername/SeriesVault.git)
+cd SeriesVault
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Step 2: Install Dependencies
+```bash
+npm install
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Step 3: Configure Supabase & TMDB API
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+Because this app relies on live movie data, you must connect your Supabase instance and store your TMDB API key securely in your backend dashboard:
+
+Create a new project in your Supabase Dashboard.
+
+Run the database schema migrations (if applicable) to set up the movies, watchlist, and tier-list tables.
+
+Navigate to your Supabase project settings and add your TMDB_API_READ_ACCESS_TOKEN to your backend environment variables/secrets so the app can fetch real-time movie details, imagery, and upcoming release dates.
+
+### Step 4: Set Up Environment Variables
+Create a .env file in the root directory of your project and paste your Supabase credentials:
+```bash
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_public_key
+VITE_SUPABASE_PROJECT_ID=your_supabase_project_id
+```
+
+### Step 5: Start the Local Server
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
